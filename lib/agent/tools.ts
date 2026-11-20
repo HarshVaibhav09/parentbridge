@@ -490,7 +490,7 @@ const writeBrief: AgentTool<MatchCtx> = {
 // ─── 8. draft_family_message ──────────────────────────────────────────────────
 export const draftFamilyMessage: AgentTool<MatchCtx> = {
   name: "draft_family_message",
-  description: `Save the WhatsApp offer to the family, in the family's language (native script). Under 60 words, warm and respectful, no sales pitch. Say who the NIAT parent is (first name, their child's year and campus, same district/language) and offer a free 20-minute call. Must include the placeholder ${BOOKING_PLACEHOLDER} and end with "Reply STOP to opt out" (keep STOP in English). Never mention placements, jobs, salaries, guarantees or fee amounts.`,
+  description: `Save the WhatsApp offer to the family, in the family's language (native script). It is sent by NIAT's ParentBridge team — write about the NIAT parent in the third person, never as them. Under 60 words, warm and respectful, no sales pitch. Say who the NIAT parent is (first name, their child's year and campus, same district/language) and offer a free 20-minute call. Must include the placeholder ${BOOKING_PLACEHOLDER} and end with "Reply STOP to opt out" (keep STOP in English). Never mention placements, jobs, salaries, guarantees or fee amounts.`,
   schema: DraftFamilyMessageArgs,
   async run(args: z.infer<typeof DraftFamilyMessageArgs>, ctx) {
     ctx.called.add("draft_family_message");

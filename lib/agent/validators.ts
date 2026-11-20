@@ -82,8 +82,13 @@ export function scanRedFlags(text: string): RedFlag[] {
   for (const { rule, re } of RED_FLAG_RULES) {
     const m = re.exec(text);
     if (m && !flags.some((f) => f.rule === rule)) {
-      const start = Math.max(0, m.index - 30);
-      flags.push({ rule, excerpt: text.slice(start, m.index + m[0].length + 30).replace(/\s+/g, " ").trim() });
+      // Widen to whole words (~5 words of context each side).
+      let start = Math.max(0, m.index - 30);
+      let end = Math.min(text.length, m.index + m[0].length + 30);
+      while (start > 0 && /\S/.test(text[start - 1])) start--;
+      while (end < text.length && /\S/.test(text[end])) end++;
+      const excerpt = `${start > 0 ? "…" : ""}${text.slice(start, end).replace(/\s+/g, " ").trim()}${end < text.length ? "…" : ""}`;
+      flags.push({ rule, excerpt });
     }
   }
   return flags;

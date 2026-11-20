@@ -41,10 +41,12 @@ function thinkingConfig(model: string) {
   return {};
 }
 
-export function geminiProvider(model = process.env.LLM_MODEL || "gemini-3.8-flash"): LLMProvider {
+export function geminiProvider(model = process.env.LLM_MODEL || "gemini-3.5-flash-lite"): LLMProvider {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new LLMError("gemini", "GEMINI_API_KEY is not set", { status: 401 });
-  const ai = new GoogleGenAI({ apiKey });
+  // attempts: 1 → no silent SDK retries (it would otherwise back off up to 5× on 429s);
+  // our router decides when to retry and when to fall back to Groq.
+  const ai = new GoogleGenAI({ apiKey, httpOptions: { retryOptions: { attempts: 1 } } });
 
   return {
     name: "gemini",

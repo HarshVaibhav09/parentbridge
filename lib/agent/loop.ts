@@ -113,7 +113,7 @@ export async function runAgentLoop<C>(opts: {
       tool_calls: res.toolCalls.map((c) => c.name),
       text: res.text ? res.text.slice(0, 500) : undefined,
       fallback: failed.length
-        ? `${failed.map((f) => `${f.provider} ${f.status ?? "error"}`).join(", ")} → ${res.provider}`
+        ? `${failed.map((f) => `${f.model} ${f.status ?? "error"}`).join(", ")} → ${res.model}`
         : undefined,
     };
     turns.push(turnRec);

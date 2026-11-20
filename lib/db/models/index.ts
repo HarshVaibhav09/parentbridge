@@ -10,3 +10,4 @@ export { CreditLedger, type CreditLedgerDoc } from "./CreditLedger";
 export { Event, type EventDoc } from "./Event";
 export { PincodeDistrict, type PincodeDistrictDoc } from "./PincodeDistrict";
 export { RateLimit, type RateLimitDoc } from "./RateLimit";
+export { Meta, type MetaDoc } from "./Meta";

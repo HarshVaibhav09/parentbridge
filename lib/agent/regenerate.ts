@@ -45,10 +45,12 @@ export async function regenerateFamilyMessage(opts: {
     const res = await runAgentLoop({
       system: SYSTEM,
       prompt: [
-        `Write this WhatsApp offer in ${langName(opts.language)} (${opts.language}) for ${lead.parent_name}, parent of ${lead.student_name}.`,
+        `Write this WhatsApp offer in ${langName(opts.language)} (${opts.language}).`,
+        `RECIPIENT (the stalled family): ${lead.parent_name}, parent of ${lead.student_name} (a prospective student who has NOT joined yet), from ${lead.district}.`,
         amb
-          ? `NIAT parent: ${amb.name.split(" ")[0]} from ${amb.district}; their child is in Year ${amb.child_year} at ${amb.university}, ${amb.campus_city}. Speaks: ${amb.languages.map(langName).join(", ")}.`
+          ? `THE NIAT PARENT they can talk to: ${amb.name.split(" ")[0]} from ${amb.district} — a different family, whose own child ${amb.child_name} is already in Year ${amb.child_year} at ${amb.university}, ${amb.campus_city}. Speaks: ${amb.languages.map(langName).join(", ")}.`
           : "",
+        "Keep these roles exactly; the message is from NIAT's ParentBridge team.",
         `Current message (${langName(current.language)}):\n"""${current.body}"""`,
       ].join("\n"),
       tools: [draftFamilyMessage],
