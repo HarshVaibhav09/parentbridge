@@ -7,7 +7,7 @@ import { runAgentLoop } from "./loop";
 import { draftFamilyMessage, newMatchCtx } from "./tools";
 
 const SYSTEM = `You adapt ParentBridge WhatsApp offers into other Indian languages for NIAT (NxtWave) admissions.
-Rules: native script; under 60 words; warm and respectful for that language's culture (e.g. "garu" in Telugu, "ji" in Hindi); keep the same facts; include ${BOOKING_PLACEHOLDER} exactly; end with "Reply STOP to opt out" (STOP stays in English).
+Rules: native script only (no letters from other scripts); under 60 words; warm and respectful, with that language's honorific (Telugu "గారు", Hindi "जी", Tamil "அவர்களே", Kannada "ಅವರೇ", Malayalam "ശ്രീ" before the name, English "Mr./Ms.") — never carry over the source language's honorific; keep the same facts; include ${BOOKING_PLACEHOLDER} exactly; end with "Reply STOP to opt out" (STOP stays in English).
 Never mention jobs, placements, salaries, guarantees or fee amounts. Never invent facts. Save the result with draft_family_message; if it is rejected, fix it and call again.`;
 
 export type RegenerateResult =

@@ -8,7 +8,9 @@
  */
 import "./env";
 import { connectDB, disconnectDB } from "../lib/db/connect";
-import { Ambassador, Booking, Call, CreditLedger, Event, Lead, Message, RateLimit } from "../lib/db/models";
+import { AgentRun, Ambassador, Booking, Call, CreditLedger, Event, Lead, Match, Message, RateLimit } from "../lib/db/models";
+import { isInLanguage } from "../lib/agent/validators";
+import type { LangCode } from "../lib/constants";
 import { clearSimulation, simulate21Days } from "../lib/simulate";
 
 async function main() {
@@ -25,6 +27,22 @@ async function main() {
   await Lead.updateMany({ featured: true }, { $set: { consent_whatsapp: true } }); // undo a STOP sent during a demo
   await Ambassador.updateMany({}, { $set: { calls_this_week: 0 } });
   await Ambassador.updateOne({ code: "amb_05" }, { $set: { calls_this_week: 3 } }); // one parent at the weekly cap
+  // Restore each family's original agent-written offer; drop cached translations that fail today's validator.
+  let dropped = 0;
+  for (const m of await Match.find({ family_message: { $ne: null } })) {
+    const variants = (m.family_message_variants ?? {}) as Record<string, { body: string; at: Date }>;
+    const clean = Object.fromEntries(
+      Object.entries(variants).filter(([lang, v]) => isInLanguage(v.body, lang as LangCode, lang === "en" ? 0.9 : 0.5) || (dropped++, false))
+    );
+    const run = m.agent_run_id ? await AgentRun.findById(m.agent_run_id).select("final_output").lean() : null;
+    const original = (run?.final_output as { family_message?: { language: string; body: string } } | null)?.family_message;
+    m.family_message_variants = clean;
+    if (original) m.family_message = original;
+    m.markModified("family_message_variants");
+    m.markModified("family_message");
+    await m.save();
+  }
+  console.log(`Restored original offers; dropped ${dropped} invalid cached translations`);
   if (process.argv.includes("--drop-manual")) {
     const d = await Lead.deleteMany({ source: "manual" });
     console.log(`Deleted ${d.deletedCount} reviewer-added leads`);

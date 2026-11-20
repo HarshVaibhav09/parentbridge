@@ -15,7 +15,7 @@ import {
   WriteBriefArgs,
   type Brief,
 } from "./schemas";
-import { ensureOptOut, isInLanguage, quoteInNotes, scanRedFlags, scriptShare, wordCount } from "./validators";
+import { ensureOptOut, foreignIndicChars, isInLanguage, quoteInNotes, scanRedFlags, scriptShare, wordCount } from "./validators";
 import type { z } from "zod";
 
 export type Candidate = {
@@ -447,7 +447,7 @@ const writeBrief: AgentTool<MatchCtx> = {
       return {
         ok: false,
         result: {
-          error: `The native brief must be written in ${langName(lang)} script (only ${Math.round(scriptShare(nativeText, lang) * 100)}% is). Rewrite it.`,
+          error: `The native brief must be written only in ${langName(lang)} script (${Math.round(scriptShare(nativeText, lang) * 100)}% is${foreignIndicChars(nativeText, lang).length ? `; it also contains ${foreignIndicChars(nativeText, lang).map(langName).join("/")} letters` : ""}). Rewrite it.`,
         },
       };
     }
@@ -457,7 +457,7 @@ const writeBrief: AgentTool<MatchCtx> = {
       ...args.english.questions_to_ask,
       ...args.english.do_not_say,
     ].join(" ");
-    if (!isInLanguage(englishText, "en", 0.85)) {
+    if (!isInLanguage(englishText, "en", 0.7)) {
       return {
         ok: false,
         result: { error: "The `english` brief must be written entirely in English (it is the counsellor's translation). Rewrite it." },
@@ -490,7 +490,7 @@ const writeBrief: AgentTool<MatchCtx> = {
 // ─── 8. draft_family_message ──────────────────────────────────────────────────
 export const draftFamilyMessage: AgentTool<MatchCtx> = {
   name: "draft_family_message",
-  description: `Save the WhatsApp offer to the family, in the family's language (native script). It is sent by NIAT's ParentBridge team — write about the NIAT parent in the third person, never as them. Under 60 words, warm and respectful, no sales pitch. Say who the NIAT parent is (first name, their child's year and campus, same district/language) and offer a free 20-minute call. Must include the placeholder ${BOOKING_PLACEHOLDER} and end with "Reply STOP to opt out" (keep STOP in English). Never mention placements, jobs, salaries, guarantees or fee amounts.`,
+  description: `Save the WhatsApp offer to the family, in the family's language (native script). It is sent by NIAT's ParentBridge team — write about the NIAT parent in the third person, never as them. Under 60 words, warm and respectful, no sales pitch. Say who the NIAT parent is (first name, their child's year and campus, same district/language) and offer a free 20-minute call. Must include the placeholder ${BOOKING_PLACEHOLDER} and end with "Reply STOP to opt out" (keep STOP in English). Never mention placements, jobs, salaries, guarantees or fee amounts. Use the honorific of the family's language: Telugu "గారు", Hindi "जी", Tamil "அவர்களே", Kannada "ಅವರೇ", Malayalam "ശ്രീ" before the name, English "Mr./Ms.".`,
   schema: DraftFamilyMessageArgs,
   async run(args: z.infer<typeof DraftFamilyMessageArgs>, ctx) {
     ctx.called.add("draft_family_message");
@@ -503,7 +503,7 @@ export const draftFamilyMessage: AgentTool<MatchCtx> = {
     const words = wordCount(args.body);
     if (words > 60) errors.push(`Too long: ${words} words (max 60, excluding the link and opt-out line). Shorten it.`);
     if (target === "en" ? !isInLanguage(args.body, "en", 0.9) : !isInLanguage(args.body, target, 0.5)) {
-      errors.push(`Write it in ${langName(target)} script (currently ${Math.round(scriptShare(args.body, target) * 100)}%).`);
+      errors.push(`Write it only in ${langName(target)} script (currently ${Math.round(scriptShare(args.body, target) * 100)}%${foreignIndicChars(args.body, target).length ? `, plus stray ${foreignIndicChars(args.body, target).map(langName).join("/")} letters` : ""}).`);
     }
     const flags = scanRedFlags(args.body);
     if (flags.length) errors.push(`Remove promises/claims: ${flags.map((f) => f.rule).join(", ")}.`);

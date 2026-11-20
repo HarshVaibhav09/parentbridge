@@ -25,7 +25,16 @@ export function scriptShare(text: string, lang: LangCode): number {
 }
 
 export function isInLanguage(text: string, lang: LangCode, threshold = 0.5) {
-  return scriptShare(text, lang) >= threshold;
+  // English text may legitimately quote a parent in their script; Indic targets must not mix scripts.
+  return scriptShare(text, lang) >= threshold && (lang === "en" || foreignIndicChars(text, lang).length === 0);
+}
+
+/** Letters from a *different* Indian script (e.g. a Telugu syllable inside a Malayalam message). */
+export function foreignIndicChars(text: string, lang: LangCode): string[] {
+  const others = (Object.keys(SCRIPT) as LangCode[]).filter((l) => l !== lang && l !== "en");
+  const found = new Set<string>();
+  for (const ch of text) for (const o of others) if (SCRIPT[o].test(ch)) found.add(o);
+  return [...found];
 }
 
 /** Words excluding the booking placeholder and the opt-out line. */

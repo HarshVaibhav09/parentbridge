@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { connectDB } from "@/lib/db/connect";
 import { RateLimit } from "@/lib/db/models";
 
 const DAY = 86_400_000;
@@ -19,6 +20,7 @@ export function istDay(d = new Date()): string {
 
 /** Atomic counter with a TTL — returns whether this hit is within the limit. */
 export async function hitLimit(key: string, limit: number, windowMs = DAY) {
+  await connectDB(); // routes may call this before anything else touches the DB (cold serverless instance)
   const now = new Date();
   const doc = await RateLimit.findOneAndUpdate(
     { key },
@@ -29,6 +31,7 @@ export async function hitLimit(key: string, limit: number, windowMs = DAY) {
 }
 
 export async function peekLimit(key: string) {
+  await connectDB();
   const doc = await RateLimit.findOne({ key }).lean();
   return doc?.count ?? 0;
 }
