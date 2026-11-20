@@ -2,7 +2,7 @@
 
 **An AI agent that turns “we’ll think about it” into a call with a parent from the family’s own district.**
 
-Live demo: **{{LIVE_URL}}** — no login. *All families and parents are synthetic.*
+Live demo: **https://parentbridge-five.vercel.app** — no login. Code: https://github.com/HarshVaibhav09/parentbridge *All families and parents are synthetic.*
 
 NIAT families often stall after counselling. The doubt is rarely the course; it is trust: NIAT is “not a college”, fees go to two parties, and no NIAT batch has graduated yet. ParentBridge offers every family that hasn’t paid for 7+ days a free 20-minute call with the **parent of a current NIATian from their own district, in their own language**, booked on WhatsApp within 48 hours.
 
