@@ -451,6 +451,18 @@ const writeBrief: AgentTool<MatchCtx> = {
         },
       };
     }
+    const englishText = [
+      args.english.family_summary,
+      ...args.english.doubts.map((d) => d.doubt),
+      ...args.english.questions_to_ask,
+      ...args.english.do_not_say,
+    ].join(" ");
+    if (!isInLanguage(englishText, "en", 0.85)) {
+      return {
+        ok: false,
+        result: { error: "The `english` brief must be written entirely in English (it is the counsellor's translation). Rewrite it." },
+      };
+    }
     const warnings: string[] = [];
     const en = args.english.do_not_say.join(" ").toLowerCase();
     const needs: Array<[RegExp, string]> = [

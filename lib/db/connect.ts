@@ -16,10 +16,38 @@ export class DbNotConfiguredError extends Error {
   }
 }
 
+/**
+ * Atlas passwords often contain characters like "@" or ":" that must be
+ * percent-encoded in a connection string. Encode the credentials safely
+ * (the host is whatever follows the *last* "@").
+ */
+export function normaliseMongoUri(uri: string): string {
+  const m = /^(mongodb(?:\+srv)?:\/\/)(.*)$/.exec(uri.trim());
+  if (!m) return uri.trim();
+  const [, scheme, rest] = m;
+  const at = rest.lastIndexOf("@");
+  if (at === -1) return uri.trim();
+  const userinfo = rest.slice(0, at);
+  const hostPart = rest.slice(at + 1);
+  const colon = userinfo.indexOf(":");
+  const enc = (s: string) => {
+    let decoded = s;
+    try {
+      decoded = decodeURIComponent(s);
+    } catch {
+      /* not encoded */
+    }
+    return encodeURIComponent(decoded);
+  };
+  const creds = colon === -1 ? enc(userinfo) : `${enc(userinfo.slice(0, colon))}:${enc(userinfo.slice(colon + 1))}`;
+  return `${scheme}${creds}@${hostPart}`;
+}
+
 export async function connectDB(): Promise<typeof mongoose> {
   if (cache.conn && mongoose.connection.readyState === 1) return cache.conn;
-  const uri = process.env.MONGODB_URI;
-  if (!uri) throw new DbNotConfiguredError();
+  const raw = process.env.MONGODB_URI;
+  if (!raw) throw new DbNotConfiguredError();
+  const uri = normaliseMongoUri(raw);
   if (!cache.promise) {
     cache.promise = mongoose
       .connect(uri, {

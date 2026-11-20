@@ -19,7 +19,7 @@ async function main() {
   const ids = process.argv.slice(2).filter((a) => /^[a-f0-9]{24}$/.test(a));
   const leads = ids.length
     ? await Lead.find({ _id: { $in: ids } }).lean()
-    : await Lead.find({ featured: true }).sort({ language: 1 }).limit(Number(process.env.N ?? 3)).lean();
+    : await Lead.find({ featured: true, pincode: { $in: (process.env.PINS ?? "522002,500028,517501").split(",") } }).lean();
 
   for (const lead of leads) {
     console.log(`\n══ ${lead.student_name} · ${lead.district} · ${lead.language} · ${lead._id} ══`);
