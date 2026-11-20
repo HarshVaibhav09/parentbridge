@@ -28,6 +28,8 @@ const KNOWN: Record<string, string> = {
   "63015": "this number hasn't joined the Twilio sandbox (send the join code first)",
   "63016": "outside WhatsApp's 24-hour window — send any message to the sandbox to reopen it",
   "63018": "sandbox rate limit (1 message every 3 seconds)",
+  "21654": "outside WhatsApp's 24-hour window (free-form text needs the demo phone to message the sandbox first — send it “hi”)",
+  "572002": "the demo phone hasn't joined this Twilio account's sandbox (send the join code, then “hi”)",
   "21608": "trial account can only message verified numbers",
   "21211": "invalid 'To' number",
   "20003": "Twilio authentication failed — check the SID/token",
