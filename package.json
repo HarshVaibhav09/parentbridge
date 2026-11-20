@@ -10,7 +10,9 @@
     "seed": "tsx scripts/seed.ts",
     "agent:test": "tsx scripts/agent-test.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "demo:reset": "tsx scripts/reset-demo.ts",
+    "demo:prerun": "tsx scripts/prerun.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
