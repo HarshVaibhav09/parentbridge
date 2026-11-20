@@ -50,6 +50,9 @@ export async function deliver(opts: {
   const to = demoRecipient();
 
   if (!opts.consent) reason = "No WhatsApp consent on file — not sent (preview only)";
+  else if (process.env.WHATSAPP_MODE === "preview")
+    reason =
+      "Preview mode — this Twilio trial number only sends pre-approved templates, so the exact message is shown here. Scan the QR or tap the link to open it in WhatsApp.";
   else if (!twilioConfigured()) reason = "Twilio is not configured — showing a preview instead";
   else if (!to) reason = "DEMO_WHATSAPP_TO is not set — live sends only go to the demo phone";
   else {

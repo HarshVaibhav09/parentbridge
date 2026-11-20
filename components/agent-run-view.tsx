@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BriefView, type Brief } from "@/components/brief-view";
+import { QRCodeSVG } from "qrcode.react";
 import { PhoneMock } from "@/components/phone-mock";
 import { LangChip, Pill, StatusChip, daysSince } from "@/components/pb";
 import { DOUBT_LABELS, FEE_BANDS, LANGUAGES, LANG_CODES, langName, type DoubtCategory } from "@/lib/constants";
@@ -717,11 +718,19 @@ function OfferPanel({ data, final }: { data: LeadView; final: Final }) {
               </p>
             ) : (
               <div className="rounded-lg bg-amber-50 p-3 text-amber-950">
-                <p className="font-medium">Preview only</p>
+                <p className="font-medium">WhatsApp preview</p>
                 <p className="text-xs">{r.fallback_reason}</p>
-                <a href={r.wa_link} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-[#128c7e] underline">
-                  Open this message in WhatsApp <ExternalLink className="size-3" aria-hidden />
-                </a>
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="shrink-0 rounded-lg bg-white p-2 shadow-sm" aria-label="QR code that opens this message in WhatsApp on a phone">
+                    <QRCodeSVG value={`${typeof window === "undefined" ? "" : window.location.origin}/w/${r._id}`} size={112} marginSize={0} level="M" />
+                  </div>
+                  <div className="text-xs">
+                    <p>Scan with your phone — WhatsApp opens with this exact message, booking link included.</p>
+                    <a href={r.wa_link} target="_blank" rel="noreferrer" className="mt-1.5 inline-flex items-center gap-1 font-medium text-[#128c7e] underline">
+                      Open this message in WhatsApp <ExternalLink className="size-3" aria-hidden />
+                    </a>
+                  </div>
+                </div>
               </div>
             )}
           </div>

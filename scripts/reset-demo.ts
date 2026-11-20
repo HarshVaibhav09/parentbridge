@@ -4,7 +4,8 @@
  *  - sets every family back to "counselled", restores NIAT parents' weekly load
  *  - keeps saved agent runs, matches and briefs (no AI quota needed to show them)
  *  - re-runs the 21-day simulation so the dashboard is populated
- *   npm run demo:reset            (add --no-sim to leave the dashboard empty, --drop-manual to delete reviewer-added leads)
+ *   npm run demo:reset            (add --no-sim to leave the dashboard empty, --drop-manual to delete reviewer-added leads,
+ *                                  --seed=N for a different simulation; default seed 97 = the numbers in the Loom script)
  */
 import "./env";
 import { connectDB, disconnectDB } from "../lib/db/connect";
@@ -54,7 +55,8 @@ async function main() {
     await clearSimulation();
     console.log("Simulation cleared.");
   } else {
-    const s = await simulate21Days();
+    const seedArg = process.argv.find((a) => a.startsWith("--seed="));
+    const s = await simulate21Days(seedArg ? Number(seedArg.split("=")[1]) : Number(process.env.DEMO_SIM_SEED ?? 97));
     console.log(`Simulation re-run (seed ${s.seed}): ${s.counts.events} events, ${s.counts.calls} calls`);
   }
   await disconnectDB();
